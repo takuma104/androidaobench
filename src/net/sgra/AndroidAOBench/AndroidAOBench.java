@@ -13,19 +13,20 @@ public class AndroidAOBench extends Activity {
 
 	private static final int WIDTH = 256;
 	private static final int HEIGHT = 256;
+	private static final int SUBSAMPLES = 2;
 	private Thread thread;
 
 	@Override
-    public void onCreate(Bundle savedInstanceState) {
+	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		SampleView sampleView = new SampleView(this);
 		AmbientOcclusion ao = new AmbientOcclusion();
 		Benchmark benchmark = new Benchmark(ao, sampleView);
-		
+
 		setContentView(sampleView);
-		
-		thread = new Thread(benchmark); 
+
+		thread = new Thread(benchmark);
 		thread.start();
 	}
 
@@ -37,16 +38,17 @@ public class AndroidAOBench extends Activity {
 			this.ao = ao;
 			this.sampleView = sampleView;
 		}
-		
+
 		public void run() {
 			android.util.Log.i("BENCH", "Start");
 
 			long start = System.currentTimeMillis();
-			int[] pixels = ao.render(WIDTH, HEIGHT, 2);
+			int[] pixels = ao.render(WIDTH, HEIGHT, SUBSAMPLES);
 			long end = System.currentTimeMillis();
 
-			android.util.Log.i("BENCH", String.format("End: elapse time %dms", end - start));
-			
+			android.util.Log.i("BENCH", String.format("End: elapse time %dsec",
+					(end - start) / 1000));
+
 			sampleView.updateBitmap(pixels, WIDTH, HEIGHT);
 		}
 	}
@@ -65,14 +67,14 @@ public class AndroidAOBench extends Activity {
 			if (_bitmap != null) {
 				canvas.drawBitmap(_bitmap, 0, 0, null);
 			}
-//			invalidate();
+			invalidate();
 		}
-		
+
 		public void updateBitmap(int[] pixels, int width, int height) {
 			_bitmap = Bitmap.createBitmap(pixels, 0, width, width, height,
 					Bitmap.Config.ARGB_8888);
-			invalidate();
+			postInvalidate();
 		}
 	}
-	
+
 }

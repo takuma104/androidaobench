@@ -118,20 +118,9 @@ public class AmbientOcclusion {
 		return new Vec3(occlusion, occlusion, occlusion);
 	}
 
-	
-	public int[] dummy_render(int w, int h) {
-		int[] pixels = new int[w*h];
-		for (int i = 0; i < w; i++) {
-			for (int j = 0; j < h; j++) {
-				pixels[i*w+j] = mkColor(Math.random()*255.0, Math.random()*255.0, Math.random()*255.0);
-			}
-		}
-		return pixels;
-	}
+	public int[] render(int w, int h, int nsubsamples) {
+		int[] pixels = new int[w * h];
 
-	public int[] do_render(int w, int h, int nsubsamples) {
-		int[] pixels = new int[w*h];
-		
 		for (int i = 0; i < w; i++) {
 			for (int j = 0; j < h; j++) {
 
@@ -176,16 +165,11 @@ public class AmbientOcclusion {
 				fcol.y /= (double) (nsubsamples * nsubsamples);
 				fcol.z /= (double) (nsubsamples * nsubsamples);
 
-				pixels[j*w+i] = mkColor(fcol.x, fcol.y, fcol.z);
+				pixels[j * w + i] = mkColor(fcol.x, fcol.y, fcol.z);
 			}
 		}
 
 		return pixels;
 	}
-	
-	public int[] render(int w, int h, int nsubsamples) {
-//		return dummy_render(w, h);
-		return do_render(w, h, nsubsamples);
-	}
-	
+
 }
