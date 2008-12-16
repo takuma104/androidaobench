@@ -59,7 +59,7 @@ public class AmbientOcclusion {
 		basis[0].normalize();
 
 		basis[1] = basis[2].cross(basis[0]);
-		basis[0].normalize();
+		basis[1].normalize();
 	}
 
 	private Vec3 computeAO(Intersection isect) {
@@ -102,8 +102,8 @@ public class AmbientOcclusion {
 
 				Intersection occIsect = new Intersection();
 				spheres[0].intersect(occIsect, ray);
-				spheres[0].intersect(occIsect, ray);
-				spheres[0].intersect(occIsect, ray);
+				spheres[1].intersect(occIsect, ray);
+				spheres[2].intersect(occIsect, ray);
 				plane.intersect(occIsect, ray);
 
 				if (occIsect.hit)
@@ -146,8 +146,8 @@ public class AmbientOcclusion {
 
 						Intersection isect = new Intersection();
 						spheres[0].intersect(isect, ray);
-						spheres[0].intersect(isect, ray);
-						spheres[0].intersect(isect, ray);
+						spheres[1].intersect(isect, ray);
+						spheres[2].intersect(isect, ray);
 						plane.intersect(isect, ray);
 
 						if (isect.hit) {
