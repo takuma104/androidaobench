@@ -11,38 +11,68 @@ import aobench.AmbientOcclusion;
 
 public class AndroidAOBench extends Activity {
 
-	private static final int WIDTH = 32;
-	private static final int HEIGHT = 32;
+	private static final int WIDTH = 256;
+	private static final int HEIGHT = 256;
+	private Thread thread;
 
 	@Override
     public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		SampleView sampleView = new SampleView(this);
 		AmbientOcclusion ao = new AmbientOcclusion();
-		android.util.Log.i("BENCH", "start");
-		// bench start
-		int[] pixels = ao.render(WIDTH, HEIGHT, 2);
-		// bench end
-		android.util.Log.i("BENCH", "end");
-		setContentView(new SampleView(this, pixels, WIDTH, HEIGHT));
+		Benchmark benchmark = new Benchmark(ao, sampleView);
+		
+		setContentView(sampleView);
+		
+		thread = new Thread(benchmark); 
+		thread.start();
+	}
+
+	private static class Benchmark implements Runnable {
+		AmbientOcclusion ao;
+		SampleView sampleView;
+
+		public Benchmark(AmbientOcclusion ao, SampleView sampleView) {
+			this.ao = ao;
+			this.sampleView = sampleView;
+		}
+		
+		public void run() {
+			android.util.Log.i("BENCH", "Start");
+
+			long start = System.currentTimeMillis();
+			int[] pixels = ao.render(WIDTH, HEIGHT, 2);
+			long end = System.currentTimeMillis();
+
+			android.util.Log.i("BENCH", String.format("End: elapse time %dms", end - start));
+			
+			sampleView.updateBitmap(pixels, WIDTH, HEIGHT);
+		}
 	}
 
 	private static class SampleView extends View {
-		private Bitmap _bitmap;
+		private Bitmap _bitmap = null;
 
-		public SampleView(Context context, int[] pixels, int width, int height) {
+		public SampleView(Context context) {
 			super(context);
 			setFocusable(true);
-
-			_bitmap = Bitmap.createBitmap(pixels, 0, width, width, height,
-					Bitmap.Config.ARGB_8888);
 		}
 
 		@Override
 		protected void onDraw(Canvas canvas) {
 			canvas.drawColor(0xFF444444);
-			canvas.drawBitmap(_bitmap, 0, 0, null);
+			if (_bitmap != null) {
+				canvas.drawBitmap(_bitmap, 0, 0, null);
+			}
+//			invalidate();
+		}
+		
+		public void updateBitmap(int[] pixels, int width, int height) {
+			_bitmap = Bitmap.createBitmap(pixels, 0, width, width, height,
+					Bitmap.Config.ARGB_8888);
 			invalidate();
 		}
 	}
+	
 }
